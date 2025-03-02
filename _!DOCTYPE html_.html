@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Aprende las Tablas de Multiplicar!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 
+    Instrucciones de uso:
+    1. Guarda este archivo como "tablas.html"
+    2. Haz doble clic para abrirlo en tu navegador (Chrome, Firefox, Edge, etc.)
+    3. Responde las multiplicaciones ingresando el número en el campo de texto
+    4. Presiona "Comprobar" o la tecla Enter para verificar tu respuesta
+    5. Usa el botón "Reiniciar" para empezar de nuevo
+    -->
+</head>
+<body class="bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200 min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md">
+        <h1 class="text-3xl font-bold text-center text-purple-600 mb-4 animate-bounce">¡Tablas divertidas!</h1>
+        
+        <!-- Contenedor de la multiplicación y entrada -->
+        <div class="text-center mb-6">
+            <p id="multiplication" class="text-4xl font-bold text-blue-600 mb-4">5 × 3 = ?</p>
+            <input 
+                id="answer" 
+                type="number" 
+                class="w-24 text-2xl text-center border-2 border-purple-300 rounded-lg p-2 focus:outline-none focus:border-purple-500 transition-colors" 
+                placeholder="Tu respuesta"
+            >
+        </div>
+
+        <!-- Botón de comprobar -->
+        <button 
+            id="checkButton" 
+            class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg mb-4 transition-all duration-300 transform hover:scale-105"
+            onclick="checkAnswer()"
+        >
+            ¡Comprobar!
+        </button>
+
+        <!-- Mensaje de retroalimentación -->
+        <p id="feedback" class="text-xl text-center font-semibold mb-4 h-12"></p>
+
+        <!-- Puntuación -->
+        <div class="flex justify-between text-lg font-bold mb-6">
+            <span class="text-green-600">Aciertos: <span id="correct">0</span></span>
+            <span class="text-red-600">Errores: <span id="wrong">0</span></span>
+        </div>
+
+        <!-- Botón de reinicio -->
+        <button 
+            id="resetButton" 
+            class="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-3 rounded-lg transition-all duration-300 transform hover:scale-105"
+            onclick="resetGame()"
+        >
+            ¡Jugar de nuevo!
+        </button>
+    </div>
+
+    <script>
+        let num1, num2, correctCount = 0, wrongCount = 0;
+
+        // Generar nueva multiplicación
+        function newMultiplication() {
+            num1 = Math.floor(Math.random() * 9) + 1;
+            num2 = Math.floor(Math.random() * 9) + 1;
+            document.getElementById('multiplication').textContent = `${num1} × ${num2} = ?`;
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer').focus();
+        }
+
+        // Comprobar respuesta
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const correctAnswer = num1 * num2;
+            const feedback = document.getElementById('feedback');
+
+            if (userAnswer === correctAnswer) {
+                feedback.textContent = '¡Genial! 🎉';
+                feedback.className = 'text-xl text-center font-semibold mb-4 text-green-600 animate-pulse';
+                correctCount++;
+                document.getElementById('correct').textContent = correctCount;
+                playSound('correct');
+            } else {
+                feedback.textContent = `¡Ups! Era ${correctAnswer}. Intenta otra vez. 😊`;
+                feedback.className = 'text-xl text-center font-semibold mb-4 text-red-600 animate-shake';
+                wrongCount++;
+                document.getElementById('wrong').textContent = wrongCount;
+                playSound('wrong');
+            }
+
+            setTimeout(newMultiplication, 1500);
+        }
+
+        // Reiniciar juego
+        function resetGame() {
+            correctCount = 0;
+            wrongCount = 0;
+            document.getElementById('correct').textContent = '0';
+            document.getElementById('wrong').textContent = '0';
+            newMultiplication();
+        }
+
+        // Sonidos básicos (usando tonos simples)
+        function playSound(type) {
+            const audio = new AudioContext();
+            const oscillator = audio.createOscillator();
+            oscillator.type = 'sine';
+            oscillator.frequency.value = type === 'correct' ? 600 : 300;
+            oscillator.connect(audio.destination);
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), 200);
+        }
+
+        // Animaciones personalizadas con Tailwind
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                50% { transform: translateX(5px); }
+                75% { transform: translateX(-5px); }
+                100% { transform: translateX(0); }
+            }
+            .animate-shake {
+                animation: shake 0.5s;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Iniciar juego
+        newMultiplication();
+
+        // Permitir comprobar con la tecla Enter
+        document.getElementById('answer').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkAnswer();
+        });
+    </script>
+</body>
+</html>
